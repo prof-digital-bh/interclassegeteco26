@@ -317,6 +317,7 @@ textarea{resize:vertical;min-height:60px}
   <button class="nav-btn" onclick="showSection('agenda',this)"><i class="ti ti-calendar"></i>AGENDA</button>
   <button class="nav-btn" onclick="showSection('turmas',this)"><i class="ti ti-users"></i>TURMAS</button>
   <button class="nav-btn" onclick="showSection('modalidades',this)"><i class="ti ti-ball-football"></i>MODALIDADES</button>
+  <button class="nav-btn" onclick="showSection('times',this)"><i class="ti ti-shield"></i>TIMES</button>
   <button class="nav-btn" onclick="showSection('jogadores',this)"><i class="ti ti-user"></i>ATLETAS</button>
   <button class="nav-btn" onclick="showSection('jogos',this)"><i class="ti ti-whistle"></i>JOGOS</button>
   <button class="nav-btn" onclick="showSection('bracket',this)"><i class="ti ti-tournament"></i>CHAVEAMENTO</button>
@@ -387,6 +388,28 @@ textarea{resize:vertical;min-height:60px}
 <!-- ───── TURMAS ───── -->
 <div class="section" id="sec-turmas">
   <div id="perm-turmas-form">
+    <div class="card" style="margin-bottom:10px">
+      <div class="card-title"><i class="ti ti-file-upload"></i>IMPORTAR TURMAS VIA CSV
+        <div class="card-title-right">
+          <button class="btn btn-ghost btn-sm" onclick="downloadTemplateTurmas()"><i class="ti ti-download"></i> Baixar Modelo CSV</button>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--gray3);font-family:var(--font-cond);margin-bottom:10px">
+        Colunas esperadas: <b>nome, turno, cor1, cor2, cor3</b> &nbsp;·&nbsp; Turno: Manhã / Tarde / Noturno &nbsp;·&nbsp; Cores em hex (ex: #1a7a3c)
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input type="file" id="csv-turmas-input" accept=".csv" style="flex:1;min-width:200px" onchange="importCSVTurmas(this)">
+        <button class="btn btn-green" onclick="document.getElementById('csv-turmas-input').click()"><i class="ti ti-upload"></i> Selecionar CSV</button>
+      </div>
+      <div id="csv-turmas-preview" style="margin-top:10px;display:none">
+        <div style="font-family:var(--font-cond);font-size:12px;color:var(--gray4);margin-bottom:6px">PRÉ-VISUALIZAÇÃO</div>
+        <div class="tbl-wrap"><table class="tbl" id="csv-turmas-table"></table></div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-green" onclick="confirmarImportTurmas()"><i class="ti ti-check"></i> CONFIRMAR IMPORTAÇÃO</button>
+          <button class="btn btn-ghost" onclick="cancelarImportTurmas()">CANCELAR</button>
+        </div>
+      </div>
+    </div>
     <div class="card">
       <div class="card-title"><i class="ti ti-plus"></i>CADASTRAR TURMA</div>
       <div class="form-row">
@@ -425,7 +448,8 @@ textarea{resize:vertical;min-height:60px}
       </div>
       <button class="btn btn-green" onclick="addTurma()"><i class="ti ti-plus"></i>CADASTRAR TURMA</button>
     </div>
-  </div>
+  </div><!-- /card form -->
+  </div><!-- /perm-turmas-form -->
   <div class="card">
     <div class="card-title"><i class="ti ti-users"></i>TURMAS CADASTRADAS
       <div class="card-title-right">
@@ -440,6 +464,28 @@ textarea{resize:vertical;min-height:60px}
 <!-- ───── MODALIDADES ───── -->
 <div class="section" id="sec-modalidades">
   <div id="perm-mod-form">
+    <div class="card" style="margin-bottom:10px">
+      <div class="card-title"><i class="ti ti-file-upload"></i>IMPORTAR MODALIDADES VIA CSV
+        <div class="card-title-right">
+          <button class="btn btn-ghost btn-sm" onclick="downloadTemplateModalidades()"><i class="ti ti-download"></i> Baixar Modelo CSV</button>
+        </div>
+      </div>
+      <div style="font-size:12px;color:var(--gray3);font-family:var(--font-cond);margin-bottom:10px">
+        Colunas esperadas: <b>nome, icone, maxJogadores, formato, grupo</b> &nbsp;·&nbsp; Ícone: ball-football / ball-volleyball / ball-basketball / run / trophy &nbsp;·&nbsp; Formato: Grupos + Eliminatórias / Pontos Corridos / Eliminação Simples &nbsp;·&nbsp; Grupo: A / B / C ou vazio
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <input type="file" id="csv-mods-input" accept=".csv" style="flex:1;min-width:200px" onchange="importCSVMods(this)">
+        <button class="btn btn-green" onclick="document.getElementById('csv-mods-input').click()"><i class="ti ti-upload"></i> Selecionar CSV</button>
+      </div>
+      <div id="csv-mods-preview" style="margin-top:10px;display:none">
+        <div style="font-family:var(--font-cond);font-size:12px;color:var(--gray4);margin-bottom:6px">PRÉ-VISUALIZAÇÃO</div>
+        <div class="tbl-wrap"><table class="tbl" id="csv-mods-table"></table></div>
+        <div style="display:flex;gap:8px;margin-top:10px">
+          <button class="btn btn-green" onclick="confirmarImportMods()"><i class="ti ti-check"></i> CONFIRMAR IMPORTAÇÃO</button>
+          <button class="btn btn-ghost" onclick="cancelarImportMods()">CANCELAR</button>
+        </div>
+      </div>
+    </div>
     <div class="card">
       <div class="card-title"><i class="ti ti-plus"></i>CADASTRAR MODALIDADE</div>
       <div class="form-row">
@@ -482,9 +528,54 @@ textarea{resize:vertical;min-height:60px}
         </div>
       </div>
       <button class="btn btn-green" onclick="addModalidade()"><i class="ti ti-plus"></i>CADASTRAR MODALIDADE</button>
+    </div><!-- /card form -->
+  </div><!-- /perm-mod-form -->
+  <div id="mods-grid" class="grid3"></div>
+</div>
+
+<!-- ───── TIMES ───── -->
+<div class="section" id="sec-times">
+  <div id="perm-times-form">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-plus"></i>CRIAR TIME</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome do Time</label>
+          <input id="tm-nome" placeholder="Ex: Os Guerreiros" />
+        </div>
+        <div class="form-group">
+          <label>Turma (base)</label>
+          <select id="tm-turma" onchange="onTimeTurmaChange()"><option value="">Selecione a turma</option></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Modalidade</label>
+          <select id="tm-mod"><option value="">Selecione a modalidade</option></select>
+        </div>
+        <div class="form-group">
+          <label>Apelido / Mascote (opcional)</label>
+          <input id="tm-apelido" placeholder="Ex: Tubarões, Falcões..." />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Jogadores da Turma Disponíveis</label>
+        <div id="tm-jogadores-list" style="background:var(--gray1);border-radius:var(--radius-sm);padding:12px;min-height:60px;font-size:13px;color:var(--gray3);font-family:var(--font-cond)">
+          Selecione uma turma para ver os atletas disponíveis.
+        </div>
+      </div>
+      <button class="btn btn-green" onclick="addTime()"><i class="ti ti-plus"></i>CRIAR TIME</button>
     </div>
   </div>
-  <div id="mods-grid" class="grid3"></div>
+  <div class="card">
+    <div class="card-title"><i class="ti ti-shield"></i>TIMES CADASTRADOS
+      <div class="card-title-right">
+        <select id="ftm-mod" onchange="renderTimes()" style="font-size:12px;padding:4px 8px"><option value="">Todas as modalidades</option></select>
+        <select id="ftm-turma" onchange="renderTimes()" style="font-size:12px;padding:4px 8px"><option value="">Todas as turmas</option></select>
+      </div>
+    </div>
+    <div id="times-list" class="grid2"></div>
+  </div>
 </div>
 
 <!-- ───── JOGADORES ───── -->
@@ -775,10 +866,10 @@ const ROLE_CLASSES={admin:'role-admin',arbitro:'role-arbitro',professor:'role-pr
 let currentUser={name:'',role:''};
 let selectedRole='admin';
 
-let DB={turmas:[],modalidades:[],jogadores:[],jogos:[],cartoes:[]};
+let DB={turmas:[],modalidades:[],jogadores:[],jogos:[],cartoes:[],times:[]};
 
 function saveDB(){try{localStorage.setItem('geteco26_v2',JSON.stringify(DB))}catch(e){}}
-function loadDB(){try{const d=localStorage.getItem('geteco26_v2');if(d){DB=JSON.parse(d)}}catch(e){}}
+function loadDB(){try{const d=localStorage.getItem('geteco26_v2');if(d){DB=JSON.parse(d);if(!DB.times)DB.times=[];}}catch(e){}}
 loadDB();
 
 // ── LOGIN ──
@@ -910,6 +1001,172 @@ function buildNotifications(){
     </div>`).join('');
 }
 
+// ══════════════════════════════════════
+// ── CSV IMPORT ──
+// ══════════════════════════════════════
+
+let _csvTurmasPending = [];
+let _csvModsPending = [];
+
+function parseCSV(text) {
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+  return lines.slice(1).filter(l => l.trim()).map(line => {
+    // handle quoted fields
+    const vals = [];
+    let cur = '', inQ = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { inQ = !inQ; }
+      else if (ch === ',' && !inQ) { vals.push(cur.trim()); cur = ''; }
+      else { cur += ch; }
+    }
+    vals.push(cur.trim());
+    const obj = {};
+    headers.forEach((h, i) => obj[h] = (vals[i] || '').replace(/^"|"$/g, ''));
+    return obj;
+  });
+}
+
+function downloadTemplateTurmas() {
+  const csv = 'nome,turno,cor1,cor2,cor3\n3º Ano A,Manhã,#1a7a3c,#ffffff,#f5c842\n3º Ano B,Tarde,#1565c0,#ffffff,#f5c842\n2º Ano A,Manhã,#c0392b,#ffffff,#f5c842';
+  downloadCSV(csv, 'modelo_turmas.csv');
+}
+
+function downloadTemplateModalidades() {
+  const csv = 'nome,icone,maxJogadores,formato,grupo\nFutebol Society,ball-football,11,Grupos + Eliminatórias,A\nVôlei,ball-volleyball,6,Pontos Corridos,B\nBasquete,ball-basketball,5,Eliminação Simples,';
+  downloadCSV(csv, 'modelo_modalidades.csv');
+}
+
+function downloadCSV(content, filename) {
+  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+function importCSVTurmas(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const rows = parseCSV(e.target.result);
+    if (!rows.length) { showToast('CSV vazio ou inválido.', 'err'); return; }
+    _csvTurmasPending = rows;
+    // build preview table
+    const tbl = document.getElementById('csv-turmas-table');
+    const TURNOS = ['Manhã', 'Tarde', 'Noturno'];
+    tbl.innerHTML = `<thead><tr><th>Nome</th><th>Turno</th><th>Cor 1</th><th>Cor 2</th><th>Cor 3</th><th>Uniforme</th><th>Status</th></tr></thead>`;
+    const tbody = document.createElement('tbody');
+    rows.forEach(r => {
+      const turno = TURNOS.includes(r.turno) ? r.turno : 'Manhã';
+      const cor1 = /^#[0-9a-fA-F]{6}$/.test(r.cor1) ? r.cor1 : '#1a7a3c';
+      const cor2 = /^#[0-9a-fA-F]{6}$/.test(r.cor2) ? r.cor2 : '#ffffff';
+      const cor3 = /^#[0-9a-fA-F]{6}$/.test(r.cor3) ? r.cor3 : '#f5c842';
+      const ok = r.nome && r.nome.trim();
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><b>${r.nome||'—'}</b></td>
+        <td>${turno}</td>
+        <td><span style="display:inline-flex;align-items:center;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:${cor1};display:inline-block;border:1px solid #ccc"></span>${cor1}</span></td>
+        <td><span style="display:inline-flex;align-items:center;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:${cor2};display:inline-block;border:1px solid #ccc"></span>${cor2}</span></td>
+        <td><span style="display:inline-flex;align-items:center;gap:4px"><span style="width:14px;height:14px;border-radius:50%;background:${cor3};display:inline-block;border:1px solid #ccc"></span>${cor3}</span></td>
+        <td>${shirt(cor1,cor2,cor3,'10',32)}</td>
+        <td>${ok ? '<span class="badge badge-green">✓ OK</span>' : '<span class="badge badge-red">✗ Sem nome</span>'}</td>`;
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+    document.getElementById('csv-turmas-preview').style.display = 'block';
+    showToast(`${rows.length} turma(s) carregada(s). Confirme para importar.`, 'warn');
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function confirmarImportTurmas() {
+  const TURNOS = ['Manhã', 'Tarde', 'Noturno'];
+  let count = 0;
+  _csvTurmasPending.forEach(r => {
+    if (!r.nome || !r.nome.trim()) return;
+    const turno = TURNOS.includes(r.turno) ? r.turno : 'Manhã';
+    const cor1 = /^#[0-9a-fA-F]{6}$/.test(r.cor1) ? r.cor1 : '#1a7a3c';
+    const cor2 = /^#[0-9a-fA-F]{6}$/.test(r.cor2) ? r.cor2 : '#ffffff';
+    const cor3 = /^#[0-9a-fA-F]{6}$/.test(r.cor3) ? r.cor3 : '#f5c842';
+    DB.turmas.push({ id: Date.now() + Math.random(), nome: r.nome.trim(), turno, cor1, cor2, cor3 });
+    count++;
+  });
+  saveDB(); renderAll();
+  showToast(`${count} turma(s) importada(s) com sucesso! ✅`);
+  cancelarImportTurmas();
+}
+
+function cancelarImportTurmas() {
+  _csvTurmasPending = [];
+  document.getElementById('csv-turmas-preview').style.display = 'none';
+  document.getElementById('csv-turmas-input').value = '';
+}
+
+function importCSVMods(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const rows = parseCSV(e.target.result);
+    if (!rows.length) { showToast('CSV vazio ou inválido.', 'err'); return; }
+    _csvModsPending = rows;
+    const ICONS = ['ball-football','ball-volleyball','ball-basketball','run','trophy'];
+    const FORMATOS = ['Grupos + Eliminatórias','Pontos Corridos','Eliminação Simples'];
+    const tbl = document.getElementById('csv-mods-table');
+    tbl.innerHTML = `<thead><tr><th>Nome</th><th>Ícone</th><th>Máx. Jog.</th><th>Formato</th><th>Grupo</th><th>Status</th></tr></thead>`;
+    const tbody = document.createElement('tbody');
+    rows.forEach(r => {
+      const icon = ICONS.includes(r.icone) ? r.icone : 'trophy';
+      const fmt = FORMATOS.includes(r.formato) ? r.formato : FORMATOS[0];
+      const maxJ = parseInt(r.maxJogadores) || 11;
+      const grp = ['A','B','C'].includes(r.grupo) ? r.grupo : '';
+      const ok = r.nome && r.nome.trim();
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td><b>${r.nome||'—'}</b></td>
+        <td><i class="ti ti-${icon}" style="font-size:18px"></i> ${icon}</td>
+        <td class="center">${maxJ}</td>
+        <td>${fmt}</td>
+        <td class="center">${grp || '—'}</td>
+        <td>${ok ? '<span class="badge badge-green">✓ OK</span>' : '<span class="badge badge-red">✗ Sem nome</span>'}</td>`;
+      tbody.appendChild(tr);
+    });
+    tbl.appendChild(tbody);
+    document.getElementById('csv-mods-preview').style.display = 'block';
+    showToast(`${rows.length} modalidade(s) carregada(s). Confirme para importar.`, 'warn');
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function confirmarImportMods() {
+  const ICONS = ['ball-football','ball-volleyball','ball-basketball','run','trophy'];
+  const FORMATOS = ['Grupos + Eliminatórias','Pontos Corridos','Eliminação Simples'];
+  let count = 0;
+  _csvModsPending.forEach(r => {
+    if (!r.nome || !r.nome.trim()) return;
+    const icon = ICONS.includes(r.icone) ? r.icone : 'trophy';
+    const fmt = FORMATOS.includes(r.formato) ? r.formato : FORMATOS[0];
+    const maxJ = parseInt(r.maxJogadores) || 11;
+    const grp = ['A','B','C'].includes(r.grupo) ? r.grupo : '';
+    DB.modalidades.push({ id: Date.now() + Math.random(), nome: r.nome.trim(), icon, maxJog: maxJ, formato: fmt, grupo: grp });
+    count++;
+  });
+  saveDB(); renderAll();
+  showToast(`${count} modalidade(s) importada(s) com sucesso! ✅`);
+  cancelarImportMods();
+}
+
+function cancelarImportMods() {
+  _csvModsPending = [];
+  document.getElementById('csv-mods-preview').style.display = 'none';
+  document.getElementById('csv-mods-input').value = '';
+}
+
 // ── TURMAS ──
 function addTurma(){
   const nome=document.getElementById('t-nome').value.trim();
@@ -978,6 +1235,107 @@ function renderModalidades(){
   const mods=DB.modalidades;
   ['g-mod','cl-mod','br-mod','fj-mod','ag-mod','art-mod'].forEach(sid=>{
     populateSelect(sid,mods,m=>m.id,m=>m.nome,sid.startsWith('f')||sid.startsWith('ag')||sid.startsWith('art')?'Todas':'Selecione');
+  });
+}
+
+// ── TIMES ──
+function onTimeTurmaChange() {
+  const turmaId = parseInt(document.getElementById('tm-turma').value);
+  const el = document.getElementById('tm-jogadores-list');
+  if (!turmaId) {
+    el.innerHTML = '<span style="color:var(--gray3)">Selecione uma turma para ver os atletas disponíveis.</span>';
+    return;
+  }
+  const jogs = DB.jogadores.filter(j => j.turmaId === turmaId);
+  if (!jogs.length) {
+    el.innerHTML = '<span style="color:var(--gray3)">Nenhum atleta cadastrado nesta turma ainda.</span>';
+    return;
+  }
+  el.innerHTML = jogs.map(j =>
+    `<label style="display:inline-flex;align-items:center;gap:6px;margin:4px 8px 4px 0;cursor:pointer;font-family:var(--font-cond);font-size:13px">
+      <input type="checkbox" value="${j.id}" checked style="width:auto;margin:0">
+      <span>#${j.camisa} ${j.nome}</span>${j.posicao?`<span style="color:var(--gray3);font-size:11px">(${j.posicao})</span>`:''}
+    </label>`
+  ).join('');
+}
+
+function addTime() {
+  const nome = document.getElementById('tm-nome').value.trim();
+  const turmaId = parseInt(document.getElementById('tm-turma').value);
+  const modId = parseInt(document.getElementById('tm-mod').value);
+  if (!nome) { showToast('Informe o nome do time.', 'err'); return; }
+  if (!turmaId) { showToast('Selecione a turma base.', 'err'); return; }
+  if (!modId) { showToast('Selecione a modalidade.', 'err'); return; }
+  // collect selected players
+  const checks = document.querySelectorAll('#tm-jogadores-list input[type=checkbox]:checked');
+  const jogadoresIds = Array.from(checks).map(c => parseInt(c.value));
+  const apelido = document.getElementById('tm-apelido').value.trim();
+  const t = getTurma(turmaId);
+  DB.times.push({
+    id: Date.now(), nome, apelido, turmaId, modalidadeId: modId,
+    jogadoresIds,
+    cor1: t ? t.cor1 : '#1a7a3c', cor2: t ? t.cor2 : '#ffffff', cor3: t ? t.cor3 : '#f5c842'
+  });
+  saveDB(); renderAll();
+  showToast(`Time "${nome}" criado!`);
+  document.getElementById('tm-nome').value = '';
+  document.getElementById('tm-apelido').value = '';
+  document.getElementById('tm-jogadores-list').innerHTML = '<span style="color:var(--gray3)">Selecione uma turma para ver os atletas disponíveis.</span>';
+  document.getElementById('tm-turma').value = '';
+  document.getElementById('tm-mod').value = '';
+}
+
+function delTime(id) {
+  if (!confirm('Remover time?')) return;
+  DB.times = DB.times.filter(t => t.id !== id);
+  saveDB(); renderAll(); showToast('Time removido.', 'warn');
+}
+
+function renderTimes() {
+  const el = document.getElementById('times-list');
+  if (!el) return;
+  // populate filters
+  populateSelect('ftm-mod', DB.modalidades, m => m.id, m => m.nome, 'Todas as modalidades');
+  populateSelect('ftm-turma', DB.turmas, t => t.id, t => t.nome, 'Todas as turmas');
+  // populate form selects
+  populateSelect('tm-turma', DB.turmas, t => t.id, t => t.nome, 'Selecione a turma');
+  populateSelect('tm-mod', DB.modalidades, m => m.id, m => m.nome, 'Selecione a modalidade');
+  const fMod = parseInt(document.getElementById('ftm-mod').value) || 0;
+  const fTurma = parseInt(document.getElementById('ftm-turma').value) || 0;
+  let list = DB.times;
+  if (fMod) list = list.filter(t => t.modalidadeId === fMod);
+  if (fTurma) list = list.filter(t => t.turmaId === fTurma);
+  if (!list.length) {
+    el.innerHTML = '<p style="color:var(--gray3);font-size:13px;grid-column:1/-1">Nenhum time cadastrado.</p>';
+    return;
+  }
+  el.innerHTML = '';
+  list.forEach(tm => {
+    const turma = getTurma(tm.turmaId);
+    const mod = getMod(tm.modalidadeId);
+    const jc = tm.jogadoresIds ? tm.jogadoresIds.length : 0;
+    const d = document.createElement('div');
+    d.className = 'turma-card';
+    d.style.borderColor = tm.cor1 || '#1a7a3c';
+    d.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+        ${shirt(tm.cor1||'#1a7a3c', tm.cor2||'#fff', tm.cor3||'#f5c842', '10', 44)}
+        <div>
+          <div class="tc-name" style="color:${tm.cor1||'#1a7a3c'}">${tm.nome}</div>
+          ${tm.apelido ? `<div style="font-size:11px;color:var(--gray3);font-family:var(--font-cond)">${tm.apelido}</div>` : ''}
+        </div>
+      </div>
+      <div class="tc-sub">${turma ? turma.nome : '?'} · ${mod ? mod.nome : '?'}</div>
+      <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+        <span class="badge badge-green">${jc} atleta${jc !== 1 ? 's' : ''}</span>
+        ${turma ? `<span class="badge badge-gray">${turma.turno}</span>` : ''}
+      </div>
+      ${tm.jogadoresIds && tm.jogadoresIds.length ? `
+      <div style="margin-top:8px;font-size:11px;color:var(--gray4);font-family:var(--font-cond)">
+        ${tm.jogadoresIds.map(jid => { const j = getJog(jid); return j ? `<span style="margin-right:6px">#${j.camisa} ${j.nome}</span>` : ''; }).join('')}
+      </div>` : ''}
+      ${canWrite() ? `<div style="margin-top:10px"><button class="btn btn-ghost btn-sm" onclick="delTime(${tm.id})"><i class="ti ti-trash"></i></button></div>` : ''}`;
+    el.appendChild(d);
   });
 }
 
@@ -1423,6 +1781,7 @@ function renderAll(){
   updateHeaderStats();
   renderTurmas();
   renderModalidades();
+  renderTimes();
   renderJogadores();
   renderJogos();
   renderAgenda();
